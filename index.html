@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="sa" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>संस्कृत कोश · Sanskrit Lexicon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══ Design tokens ══ */
+:root{
+  --sand:#f5efe6; --parchment:#ede4d3; --ink:#1a1410; --ink-soft:#3d3328; --ink-faint:#7a6e60;
+  --saffron:#d97c14; --saffron-lt:#f5a623; --vermillion:#c0392b;
+  --card-bg:#fdf8f0; --card-border:#d4c5aa;
+  --ribbon-bg:#fdf5e8; --ribbon-border:#c8b48e;
+  --shadow:rgba(90,60,20,.12); --shadow-hover:rgba(90,60,20,.22);
+  /* lang colours — background / border+text / solid (for active) */
+  --sa-bg:#fff4e0; --sa-c:#9a5f00; --sa-solid:#b87a00;
+  --ne-bg:#e4f5ec; --ne-c:#1a6b3e; --ne-solid:#1a6b3e;
+  --en-bg:#e4eeff; --en-c:#1a3d8a; --en-solid:#1a3d8a;
+  --hi-bg:#fde6e6; --hi-c:#8a1a1a; --hi-solid:#8a1a1a;
+  --hl-bg:#ffe066; --hl-cur:#ff9900; --hl-txt:#1a1410;
+  --radius:14px; --r-sm:8px; --tr:.2s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --sand:#1a1410; --parchment:#221c14; --ink:#f0e8d8; --ink-soft:#d4c8b0; --ink-faint:#8a7e6a;
+  --saffron:#f5a623; --saffron-lt:#ffc84a; --vermillion:#e05252;
+  --card-bg:#261f16; --card-border:#3d3024;
+  --ribbon-bg:#201810; --ribbon-border:#4a3820;
+  --shadow:rgba(0,0,0,.35); --shadow-hover:rgba(0,0,0,.55);
+  --sa-bg:#3a2800; --sa-c:#f5a623; --sa-solid:#f5a623;
+  --ne-bg:#002818; --ne-c:#3abf79; --ne-solid:#3abf79;
+  --en-bg:#001428; --en-c:#5a8de0; --en-solid:#5a8de0;
+  --hi-bg:#280000; --hi-c:#e05252; --hi-solid:#e05252;
+  --hl-bg:#7a5a00; --hl-cur:#d97c14; --hl-txt:#fff8e8;
+}
+
+/* ══ Reset ══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Crimson Pro','Noto Serif Devanagari',Georgia,serif;background:var(--sand);color:var(--ink);min-height:100vh;transition:background var(--tr),color var(--tr)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(ellipse 60% 40% at 10% 15%,rgba(217,124,20,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 50% at 90% 85%,rgba(26,74,138,.05) 0%,transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4a870' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.page{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 20px 80px}
+
+/* ══ Header ══ */
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 0;gap:16px;flex-wrap:wrap}
+.logo{display:flex;flex-direction:column;line-height:1}
+.logo-main{font-family:'Noto Serif Devanagari',serif;font-size:clamp(22px,4vw,32px);font-weight:700;color:var(--saffron);letter-spacing:-.5px}
+.logo-sub{font-family:'Crimson Pro',serif;font-size:13px;font-style:italic;color:var(--ink-faint);letter-spacing:2px;margin-top:2px;text-transform:uppercase}
+.header-actions{display:flex;align-items:center;gap:10px}
+.theme-toggle{width:40px;height:40px;border:1.5px solid var(--card-border);border-radius:50%;background:var(--card-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all var(--tr);color:var(--ink)}
+.theme-toggle:hover{border-color:var(--saffron);transform:rotate(15deg)}
+.go-to-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--card-border);border-radius:var(--r-sm);background:var(--card-bg);color:var(--saffron);text-decoration:none;font-size:14px;font-weight:500;transition:all var(--tr);font-family:'JetBrains Mono',monospace}
+.go-to-link:hover{border-color:var(--saffron);background:var(--saffron);color:var(--sand)}
+
+/* ══ Divider ══ */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--saffron) 30%,var(--card-border) 70%,transparent);margin:18px 0;opacity:.5}
+
+/* ══════════════════════════════════════════════════════
+   UNIFIED STICKY RIBBON
+   Row 1 : [🔍 input  match ↑↓ ×] [│] [scope pills] [│] [normalize]
+   Row 2 : [LANGS label] [pills…] [│] [Reset]
+══════════════════════════════════════════════════════ */
+.ribbon-sticky{
+  position:sticky;top:0;z-index:100;
+  margin-top:0; padding:8px 0 6px;
+}
+/* frosted backdrop */
+.ribbon-sticky::before{
+  content:'';position:absolute;inset:0;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  background:rgba(245,239,230,.88);
+  border-bottom:1px solid var(--ribbon-border);
+  z-index:-1;
+}
+[data-theme="dark"] .ribbon-sticky::before{background:rgba(26,20,16,.92);}
+
+.ribbon{
+  background:var(--ribbon-bg);
+  border:1.5px solid var(--ribbon-border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 3px 18px var(--shadow);
+}
+
+/* ── Ribbon row shared ── */
+.rrow{display:flex;align-items:center;gap:8px;padding:9px 14px}
+.rrow+.rrow{border-top:1px solid var(--ribbon-border)}
+
+/* ── Row 1: Lang pills + Reset ── */
+.r-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;
+  letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-faint);
+  white-space:nowrap;flex-shrink:0;
+}
+.lang-pills-wrap{display:flex;gap:6px;flex-wrap:wrap;flex:1;align-items:center}
+
+/* base inactive pill */
+.lang-pill{
+  position:relative;display:inline-flex;align-items:center;gap:5px;
+  padding:5px 13px;border-radius:999px;
+  border:1.5px solid var(--card-border);
+  background:var(--sand);
+  cursor:pointer;
+  font-size:13px;font-family:'Noto Sans Devanagari',sans-serif;font-weight:500;
+  color:var(--ink-faint);
+  transition:all var(--tr);user-select:none;white-space:nowrap;
+  box-shadow:none;
+}
+.lang-pill input{position:absolute;opacity:0;width:0;height:0}
+.lang-pill:hover{border-color:var(--saffron);color:var(--saffron);background:rgba(217,124,20,.06)}
+
+/* ── ACTIVE pills — solid fill, white text, shadow, scale up ── */
+.lang-pill.active-sa{
+  background:var(--sa-solid);border-color:var(--sa-solid);
+  color:#fff;font-weight:700;
+  box-shadow:0 2px 10px rgba(154,95,0,.35);
+  transform:scale(1.07);
+}
+.lang-pill.active-ne{
+  background:var(--ne-solid);border-color:var(--ne-solid);
+  color:#fff;font-weight:700;
+  box-shadow:0 2px 10px rgba(26,107,62,.35);
+  transform:scale(1.07);
+}
+.lang-pill.active-en{
+  background:var(--en-solid);border-color:var(--en-solid);
+  color:#fff;font-weight:700;
+  box-shadow:0 2px 10px rgba(26,61,138,.35);
+  transform:scale(1.07);
+}
+.lang-pill.active-hi{
+  background:var(--hi-solid);border-color:var(--hi-solid);
+  color:#fff;font-weight:700;
+  box-shadow:0 2px 10px rgba(138,26,26,.35);
+  transform:scale(1.07);
+}
+.lang-pill.active-all{
+  background:linear-gradient(135deg,var(--sa-solid),var(--en-solid));
+  border-color:var(--saffron);
+  color:#fff;font-weight:700;
+  box-shadow:0 2px 10px rgba(217,124,20,.4);
+  transform:scale(1.07);
+}
+
+/* dot inside pills — white when active */
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-sa{background:var(--sa-c)}.dot-ne{background:var(--ne-c)}
+.dot-en{background:var(--en-c)}.dot-hi{background:var(--hi-c)}.dot-all{background:var(--saffron)}
+.lang-pill.active-sa .dot-sa,
+.lang-pill.active-ne .dot-ne,
+.lang-pill.active-en .dot-en,
+.lang-pill.active-hi .dot-hi,
+.lang-pill.active-all .dot-all{background:rgba(255,255,255,.7)}
+
+/* reset button */
+.r-sep{width:1px;height:24px;background:var(--ribbon-border);flex-shrink:0}
+.btn-reset{
+  display:flex;align-items:center;gap:5px;padding:5px 13px;
+  border-radius:999px;border:1.5px solid var(--vermillion);
+  background:transparent;color:var(--vermillion);
+  font-family:'Crimson Pro',serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all var(--tr);white-space:nowrap;flex-shrink:0;
+}
+.btn-reset:hover{background:var(--vermillion);color:#fff;transform:scale(1.03)}
+.btn-reset svg{width:12px;height:12px}
+
+/* ── Row 2: Search ── */
+.s-icon{color:var(--ink-faint);flex-shrink:0;display:flex}
+.s-icon svg{width:16px;height:16px}
+#searchInput{
+  flex:1;border:none;background:transparent;outline:none;
+  font-family:'Noto Serif Devanagari','Crimson Pro',serif;
+  font-size:15px;color:var(--ink);caret-color:var(--saffron);
+  min-width:0;
+}
+#searchInput::placeholder{color:var(--ink-faint);font-style:italic;font-size:14px}
+.s-count{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--ink-faint);white-space:nowrap;min-width:54px;text-align:right;flex-shrink:0;
+}
+.s-count.ok{color:var(--saffron);font-weight:600}
+.s-count.none{color:var(--vermillion);font-weight:600}
+.s-nav{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.nav-btn{
+  width:27px;height:27px;border-radius:var(--r-sm);
+  border:1px solid var(--card-border);background:var(--sand);
+  color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:12px;transition:all var(--tr);
+}
+.nav-btn:hover:not(:disabled){border-color:var(--saffron);color:var(--saffron);background:var(--sa-bg)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+.s-clear{
+  width:27px;height:27px;border-radius:var(--r-sm);
+  border:1px solid transparent;background:transparent;
+  color:var(--ink-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:17px;line-height:1;transition:all var(--tr);
+}
+.s-clear:hover{border-color:var(--vermillion);color:var(--vermillion)}
+
+/* ── Row 3: Scope + Normalize ── */
+.scope-pills{display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex-shrink:0}
+/* base scope pill (inactive) */
+.sp{
+  position:relative;display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:999px;
+  border:1px solid var(--card-border);background:var(--sand);
+  cursor:pointer;font-size:11px;font-family:'Noto Sans Devanagari',sans-serif;
+  font-weight:500;color:var(--ink-faint);transition:all var(--tr);user-select:none;
+}
+.sp input{position:absolute;opacity:0;width:0;height:0}
+/* active scope pill — solid saffron */
+.sp.active{
+  background:var(--saffron);border-color:var(--saffron);
+  color:#fff;font-weight:700;
+  box-shadow:0 1px 8px rgba(217,124,20,.35);
+  transform:scale(1.05);
+}
+.sp:hover:not(.active){border-color:var(--saffron);color:var(--saffron)}
+
+/* normalize toggle */
+.norm-toggle{
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;
+  padding:3px 10px;border-radius:999px;border:1px solid var(--card-border);
+  background:var(--sand);transition:all var(--tr);flex-shrink:0;
+}
+.norm-toggle input{display:none}
+.norm-box{
+  width:14px;height:14px;border-radius:4px;
+  border:1.5px solid var(--ne-c);background:var(--sand);
+  display:flex;align-items:center;justify-content:center;transition:all var(--tr);flex-shrink:0;
+}
+.norm-toggle.on .norm-box{background:var(--ne-solid);border-color:var(--ne-solid)}
+.norm-toggle.on .norm-box::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.norm-txt{font-family:'Noto Sans Devanagari',monospace;font-size:11px;color:var(--ink-faint);white-space:nowrap}
+.norm-toggle.on{border-color:var(--ne-solid);background:var(--ne-bg)}
+.norm-toggle.on .norm-txt{color:var(--ne-c);font-weight:600}
+.norm-toggle:hover:not(.on){border-color:var(--ne-c)}
+
+/* ══ Stats bar ══ */
+.stats-bar{
+  display:flex;align-items:center;gap:12px;margin:10px 0 14px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);flex-wrap:wrap;
+}
+.stat{display:flex;align-items:center;gap:4px}
+.stat-n{color:var(--saffron);font-weight:600}
+.ov-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;
+  background:rgba(217,124,20,.12);border:1px solid rgba(217,124,20,.3);
+  color:var(--saffron);font-size:10px;font-weight:500;cursor:pointer;transition:all var(--tr);
+}
+.ov-badge:hover{background:rgba(217,124,20,.22)}
+
+/* ══ Cards ══ */
+.cards-list{display:flex;flex-direction:column;gap:14px}
+
+.card{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 3px 16px var(--shadow);
+  transition:box-shadow var(--tr),transform var(--tr),border-color var(--tr);
+  position:relative;animation:cIn .3s ease backwards;
+}
+@keyframes cIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{box-shadow:0 6px 28px var(--shadow-hover);transform:translateY(-1px);border-color:var(--saffron)}
+.card.has-override{border-color:var(--saffron)}
+.card.has-override::after{content:'✦';position:absolute;top:10px;right:10px;font-size:10px;color:var(--saffron);opacity:.8}
+.card.s-match{border-left:3px solid rgba(217,124,20,.45)}
+.card.s-cur{border-left:3px solid var(--hl-cur)!important;box-shadow:0 0 0 2px rgba(255,153,0,.2),0 6px 28px var(--shadow-hover)}
+
+/* Card header */
+.card-hdr{background:linear-gradient(135deg,var(--parchment) 0%,var(--card-bg) 100%);border-bottom:1px solid var(--card-border);padding:14px 18px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.c-word-blk{flex:1;min-width:0}
+.c-word{font-family:'Noto Serif Devanagari',serif;font-size:27px;font-weight:700;color:var(--ink);line-height:1.2;letter-spacing:-.3px}
+.c-trans{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--saffron);margin-top:3px;letter-spacing:.5px}
+.c-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.mchip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.ch-verse{background:rgba(217,124,20,.1);color:var(--saffron);border:1px solid rgba(217,124,20,.25)}
+.ch-id{background:rgba(122,110,96,.08);color:var(--ink-faint);border:1px solid var(--card-border)}
+
+/* Card body */
+.card-body{padding:12px 18px 14px}
+.meaning-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--card-border)}
+.meaning-row:last-child{border-bottom:none}
+.l-badge{font-family:'Noto Sans Devanagari','JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:1px;letter-spacing:.3px}
+.badge-sa{background:var(--sa-bg);color:var(--sa-c)}
+.badge-ne{background:var(--ne-bg);color:var(--ne-c)}
+.badge-en{background:var(--en-bg);color:var(--en-c)}
+.badge-hi{background:var(--hi-bg);color:var(--hi-c)}
+.m-text{font-family:'Noto Serif Devanagari','Crimson Pro',serif;font-size:15px;line-height:1.55;color:var(--ink-soft);flex:1}
+.m-text.en{font-family:'Crimson Pro',serif;font-style:italic}
+
+/* Card footer */
+.card-ftr{padding:9px 18px 13px;border-top:1px dashed var(--card-border);display:flex;flex-direction:column;gap:7px}
+.ftr-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--saffron);opacity:.8}
+.lc-pills{display:flex;gap:6px;flex-wrap:wrap}
+.lc-pill{
+  position:relative;display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:999px;border:1px solid var(--card-border);
+  background:var(--sand);cursor:pointer;font-size:12px;
+  font-family:'Noto Sans Devanagari',sans-serif;font-weight:500;
+  color:var(--ink-faint);transition:all var(--tr);user-select:none;
+}
+.lc-pill input{position:absolute;opacity:0;width:0;height:0}
+.lc-pill:hover{border-color:var(--saffron);color:var(--saffron)}
+.lc-pill.active-sa{background:var(--sa-solid);border-color:var(--sa-solid);color:#fff;font-weight:700}
+.lc-pill.active-ne{background:var(--ne-solid);border-color:var(--ne-solid);color:#fff;font-weight:700}
+.lc-pill.active-en{background:var(--en-solid);border-color:var(--en-solid);color:#fff;font-weight:700}
+.lc-pill.active-hi{background:var(--hi-solid);border-color:var(--hi-solid);color:#fff;font-weight:700}
+
+/* ══ Highlights ══ */
+mark.sh{background:var(--hl-bg);color:var(--hl-txt);border-radius:2px;padding:0 1px}
+mark.sh.cur{background:var(--hl-cur);color:var(--hl-txt);outline:2px solid var(--hl-cur);outline-offset:1px}
+
+/* ══ Empty ══ */
+.empty-state{text-align:center;padding:60px 20px;color:var(--ink-faint);font-family:'Crimson Pro',serif;font-size:18px;font-style:italic}
+
+/* ══ Back to top ══ */
+#btt{position:fixed;bottom:26px;right:22px;z-index:200;width:44px;height:44px;border-radius:50%;background:var(--saffron);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(217,124,20,.45);font-size:20px;font-weight:700;transition:all var(--tr);opacity:0;transform:translateY(14px) scale(.9);pointer-events:none}
+#btt.vis{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+#btt:hover{background:var(--saffron-lt);transform:translateY(-3px) scale(1.08);box-shadow:0 8px 28px rgba(217,124,20,.5)}
+
+/* ══ Responsive ══ */
+@media(max-width:640px){
+  .rrow{padding:8px 10px;gap:5px;flex-wrap:wrap}
+  .r-sep{display:none}
+  .scope-pills{gap:3px}
+  .sp{padding:2px 7px;font-size:10px}
+  .lang-pill{padding:4px 10px;font-size:12px}
+  #searchInput{font-size:14px;min-width:80px}
+  .norm-txt{display:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══ Header ══ -->
+<header>
+  <div class="logo">
+    <span class="logo-main">संस्कृत कोश</span>
+    <span class="logo-sub">Sanskrit Lexicon · Word Viewer</span>
+  </div>
+  <div class="header-actions">
+    <a href="https://shivaprasadacharya.github.io/jailbailorder/" class="go-to-link" target="_blank" rel="noopener noreferrer">Go To →</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+  </div>
+</header>
+<div class="divider"></div>
+
+<!-- ══ UNIFIED STICKY RIBBON ══ -->
+<div class="ribbon-sticky" id="ribbonSticky">
+  <div class="ribbon">
+
+    <!-- Row 1: Search + Scope + Normalize -->
+    <div class="rrow">
+      <span class="s-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6"/><line x1="13.5" y1="13.5" x2="18" y2="18"/></svg></span>
+      <input type="search" id="searchInput" placeholder="खोज्नुहोस् · Search words, meanings…" autocomplete="off" spellcheck="false" aria-label="Search">
+      <span class="s-count" id="sCount" aria-live="polite"></span>
+      <div class="s-nav">
+        <button class="nav-btn" id="navPrev" title="Previous (Shift+Enter)" aria-label="Previous match" disabled>↑</button>
+        <button class="nav-btn" id="navNext" title="Next (Enter)" aria-label="Next match" disabled>↓</button>
+        <button class="s-clear" id="sClear" title="Clear (Esc)" aria-label="Clear search">×</button>
+      </div>
+      <div class="r-sep"></div>
+      <div class="scope-pills" id="scopePills">
+        <label class="sp active" data-sc="all"><input type="radio" name="sc" value="all" checked>All</label>
+        <label class="sp" data-sc="word"><input type="radio" name="sc" value="word">Word</label>
+        <label class="sp" data-sc="sa"><input type="radio" name="sc" value="sa">सं</label>
+        <label class="sp" data-sc="ne"><input type="radio" name="sc" value="ne">ने</label>
+        <label class="sp" data-sc="en"><input type="radio" name="sc" value="en">En</label>
+        <label class="sp" data-sc="hi"><input type="radio" name="sc" value="hi">हि</label>
+      </div>
+      <div class="r-sep"></div>
+      <label class="norm-toggle" id="normToggle" title="Nepali normalize: vowels (ी→ि,ू→ु), sibilants (श/ष→स), nasals (ङ/ण/ञ/ं→न), व→ब, Devanagari digits→ASCII">
+        <input type="checkbox" id="normCk">
+        <span class="norm-box"></span>
+        <span class="norm-txt">ने~</span>
+      </label>
+    </div>
+
+    <!-- Row 2: Language selection + Reset -->
+    <div class="rrow">
+      <span class="r-label">Langs</span>
+      <div class="lang-pills-wrap" id="globalToggles">
+        <label class="lang-pill active-sa" id="pill-sa"><input type="checkbox" id="gSa" checked><span class="dot dot-sa"></span>सं</label>
+        <label class="lang-pill" id="pill-ne"><input type="checkbox" id="gNe"><span class="dot dot-ne"></span>ने</label>
+        <label class="lang-pill" id="pill-en"><input type="checkbox" id="gEn"><span class="dot dot-en"></span>En</label>
+        <label class="lang-pill" id="pill-hi"><input type="checkbox" id="gHi"><span class="dot dot-hi"></span>हि</label>
+        <label class="lang-pill" id="pill-all"><input type="checkbox" id="gAll"><span class="dot dot-all"></span>सर्व</label>
+      </div>
+      <div class="r-sep"></div>
+      <button class="btn-reset" id="btnReset" title="Reset all overrides and revert to सं only">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset
+      </button>
+    </div>
+
+  </div><!-- .ribbon -->
+</div><!-- .ribbon-sticky -->
+
+<!-- ══ Stats bar ══ -->
+<div class="stats-bar">
+  <div class="stat">Words:&nbsp;<span class="stat-n" id="wordCount">0</span></div>
+  <div class="stat" id="filtInfo" style="display:none">·&nbsp;Showing:&nbsp;<span class="stat-n" id="filtCount">0</span></div>
+  <div class="stat" id="ovInfo" style="display:none">
+    <span class="ov-badge" id="ovBadge">✦ <span id="ovCount">0</span> local override(s) — click to clear</span>
+  </div>
+</div>
+
+<!-- ══ Cards ══ -->
+<div class="cards-list" id="cardsList"></div>
+</div><!-- .page -->
+
+<!-- Back to top -->
+<button id="btt" aria-label="Back to top">↑</button>
+
+<!-- Fallback data -->
+<script>
+const FALLBACK_DATA=[
+  {id:"",   Verse:"9.1", Word:"अंश",     Trans:"a.nsha",   Sa:"भागः, अवयवः",           Ne:"भाग, अंश",      En:"a part",             Hi:"भाग, हिस्सा"},
+  {id:"2.7.1",Verse:"2.5",Word:"अंशः",   Trans:"a.nshaH",  Sa:"भागः, कणः, अवयवः",     Ne:"सानो भाग, कण",  En:"fragmental particle", Hi:"छोटा भाग, कण"},
+  {id:"2", Verse:"3.15", Word:"अंशुमान्",Trans:"a.nshumAn",Sa:"तेजस्वी, रश्मिमान्, सूर्यः",Ne:"तेजस्वी, किरणमय",En:"radiant",Hi:"तेजस्वी, किरणों वाला"}
+];
+</script>
+<script src="word.js" onerror="window._wlf=true"></script>
+<script>
+'use strict';
+
+/* ══ Nepali Normalizer (+ Devanagari digits) ══ */
+const NepaliNormalizer={
+  vowelMap:{'ी':'ि','ू':'ु'},
+  sibilantMap:{'श':'स','ष':'स'},
+  nasalMap:{'ङ':'न','ण':'न','ञ':'न','ं':'न्'},
+  vaBaMap:{'व':'ब'},
+  digitMap:{'०':'0','१':'1','२':'2','३':'3','४':'4','५':'5','६':'6','७':'7','८':'8','९':'9'},
+  normalize(text){
+    if(!text)return'';
+    let n=String(text).normalize('NFC').replace(/\u200D/g,'').replace(/\u200C/g,'');
+    for(const[f,t]of Object.entries(this.digitMap))    n=n.split(f).join(t);
+    for(const[f,t]of Object.entries(this.vowelMap))    n=n.split(f).join(t);
+    for(const[f,t]of Object.entries(this.sibilantMap)) n=n.split(f).join(t);
+    for(const[f,t]of Object.entries(this.nasalMap))    n=n.split(f).join(t);
+    for(const[f,t]of Object.entries(this.vaBaMap))     n=n.split(f).join(t);
+    return n;
+  },
+  isDevanagari(t){return/[\u0900-\u097F]/.test(t);}
+};
+
+/* ══ Constants ══ */
+const LANGS=['sa','ne','en','hi'];
+const LLABELS={sa:'सं',ne:'ने',en:'En',hi:'हि'};
+const LKEYS  ={sa:'Sa',ne:'Ne',en:'En',hi:'Hi'};
+const LBADGE ={sa:'badge-sa',ne:'badge-ne',en:'badge-en',hi:'badge-hi'};
+const LPACT  ={sa:'active-sa',ne:'active-ne',en:'active-en',hi:'active-hi'};
+const SCOPE_F={
+  all :['Word','Trans','Sa','Ne','En','Hi','Verse','id'],
+  word:['Word','Trans'],
+  sa:['Sa'],ne:['Ne'],en:['En'],hi:['Hi']
+};
+const DATA=(typeof wordData!=='undefined'&&Array.isArray(wordData)&&wordData.length)?wordData:FALLBACK_DATA;
+
+/* ══ State ══ */
+let gSel=new Set(['sa']);
+let lOvr={};
+let isDark=false;
+let sQuery='',sScope='all',sNorm=false;
+let allMarks=[],curMark=-1;
+
+/* ══ Theme ══ */
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('themeToggle').textContent=isDark?'🌙':'☀️';
+});
+
+/* ══ Back to top ══ */
+const btt=document.getElementById('btt');
+window.addEventListener('scroll',()=>btt.classList.toggle('vis',scrollY>300),{passive:true});
+btt.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+/* ══ Global lang pills ══ */
+const gCks={sa:document.getElementById('gSa'),ne:document.getElementById('gNe'),en:document.getElementById('gEn'),hi:document.getElementById('gHi'),all:document.getElementById('gAll')};
+const gPills={sa:document.getElementById('pill-sa'),ne:document.getElementById('pill-ne'),en:document.getElementById('pill-en'),hi:document.getElementById('pill-hi'),all:document.getElementById('pill-all')};
+
+function syncGPills(){
+  LANGS.forEach(l=>gPills[l].classList.toggle(LPACT[l],gSel.has(l)));
+  const allA=LANGS.every(l=>gSel.has(l));
+  gPills.all.classList.toggle('active-all',allA);
+  gCks.all.checked=allA;
+  LANGS.forEach(l=>{gCks[l].checked=gSel.has(l);});
+}
+function onGChange(lang){
+  if(lang==='all'){gSel=LANGS.every(l=>gSel.has(l))?new Set(['sa']):new Set(LANGS);}
+  else{if(gSel.has(lang)){gSel.delete(lang);if(!gSel.size)gSel.add('sa');}else gSel.add(lang);}
+  syncGPills();renderCards();
+}
+Object.keys(gCks).forEach(l=>gPills[l].addEventListener('click',e=>{e.preventDefault();onGChange(l);}));
+
+/* ══ Reset ══ */
+document.getElementById('btnReset').addEventListener('click',()=>{gSel=new Set(['sa']);lOvr={};syncGPills();renderCards();});
+document.getElementById('ovBadge').addEventListener('click',()=>{lOvr={};renderCards();});
+
+/* ══ Scope pills ══ */
+document.querySelectorAll('.sp').forEach(p=>{
+  p.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelectorAll('.sp').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');p.querySelector('input').checked=true;
+    sScope=p.dataset.sc;applySearch();
+  });
+});
+
+/* ══ Normalize toggle ══ */
+const normTgl=document.getElementById('normToggle');
+normTgl.addEventListener('click',e=>{
+  e.preventDefault();sNorm=!sNorm;
+  document.getElementById('normCk').checked=sNorm;
+  normTgl.classList.toggle('on',sNorm);applySearch();
+});
+
+/* ══ Search ══ */
+const sInput=document.getElementById('searchInput');
+sInput.addEventListener('input',()=>{sQuery=sInput.value;applySearch();});
+sInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();e.shiftKey?navMark(-1):navMark(1);}
+  if(e.key==='Escape')clearSrch();
+});
+document.getElementById('navNext').addEventListener('click',()=>navMark(1));
+document.getElementById('navPrev').addEventListener('click',()=>navMark(-1));
+document.getElementById('sClear').addEventListener('click',clearSrch);
+function clearSrch(){sInput.value='';sQuery='';applySearch();sInput.focus();}
+
+/* ══ Helpers ══ */
+function effLangs(i){return lOvr[i]!==undefined?lOvr[i]:gSel;}
+function el(tag,cls){const e=document.createElement(tag||'div');if(cls)e.className=cls;return e;}
+
+/* ══ Render ══ */
+function renderCards(){
+  const list=document.getElementById('cardsList');
+  list.innerHTML='';
+  const ovc=Object.values(lOvr).filter(v=>v!==undefined).length;
+  document.getElementById('wordCount').textContent=DATA.length;
+  document.getElementById('ovInfo').style.display=ovc?'':'none';
+  document.getElementById('ovCount').textContent=ovc;
+  if(!DATA.length){list.innerHTML='<div class="empty-state">कोई शब्द नहीं मिला · No words found</div>';return;}
+  DATA.forEach((w,i)=>{
+    const c=buildCard(w,i);
+    c.style.animationDelay=Math.min(i*.04,.4)+'s';
+    list.appendChild(c);
+  });
+  applySearch();
+}
+
+/* ══ Build card ══ */
+function buildCard(w,i){
+  const hasOv=lOvr[i]!==undefined;
+  const aLangs=effLangs(i);
+  const card=el('div','card'+(hasOv?' has-override':''));
+  card.dataset.idx=i;
+
+  /* header */
+  const hdr=el('div','card-hdr');
+  const wb=el('div','c-word-blk');
+  const cw=el('div','c-word');cw.dataset.field='Word';cw.textContent=w.Word||'—';
+  const ct=el('div','c-trans');ct.dataset.field='Trans';ct.textContent=w.Trans||'';
+  wb.appendChild(cw);wb.appendChild(ct);
+  const meta=el('div','c-meta');
+  if(w.Verse){const c=el('span','mchip ch-verse');c.dataset.field='Verse';c.textContent='v '+w.Verse;meta.appendChild(c);}
+  if(w.id)   {const c=el('span','mchip ch-id');   c.dataset.field='id';   c.textContent=w.id;       meta.appendChild(c);}
+  hdr.appendChild(wb);hdr.appendChild(meta);
+
+  /* body */
+  const body=el('div','card-body');
+  const ordered=LANGS.filter(l=>aLangs.has(l));
+  if(!ordered.length){
+    const ph=el('div');ph.style.cssText='color:var(--ink-faint);font-size:13px;font-style:italic;padding:8px 0';
+    ph.textContent='No languages selected';body.appendChild(ph);
+  }else{
+    ordered.forEach(lang=>{
+      const key=LKEYS[lang];const val=w[key];if(!val)return;
+      const row=el('div','meaning-row');
+      const badge=el('span','l-badge '+LBADGE[lang]);badge.textContent=LLABELS[lang];
+      const txt=el('span','m-text'+(lang==='en'?' en':''));txt.dataset.field=key;txt.textContent=val;
+      row.appendChild(badge);row.appendChild(txt);body.appendChild(row);
+    });
+  }
+
+  card.appendChild(hdr);card.appendChild(body);
+  card.appendChild(buildFtr(i,hasOv));
+  return card;
+}
+
+function buildFtr(i,hasOv){
+  const ftr=el('div','card-ftr');
+  const lr=el('div');lr.style.cssText='display:flex;align-items:center;justify-content:space-between';
+  const lbl=el('span','ftr-lbl');lbl.textContent=hasOv?'✦ Local override':'Add locally';
+  lr.appendChild(lbl);
+  if(hasOv){
+    const cb=el('span');cb.style.cssText='font-size:10px;color:var(--vermillion);cursor:pointer;font-family:"JetBrains Mono",monospace;letter-spacing:1px';
+    cb.textContent='× Clear';cb.addEventListener('click',()=>{delete lOvr[i];renderCards();});
+    lr.appendChild(cb);
+  }
+  ftr.appendChild(lr);
+  const pr=el('div','lc-pills');
+  const aLangs=effLangs(i);
+  let ec=0;
+  LANGS.forEach(lang=>{
+    if(gSel.has(lang))return;ec++;
+    const inA=aLangs.has(lang);
+    const pill=el('label','lc-pill'+(inA?' '+LPACT[lang]:''));
+    pill.title=inA?`Remove ${LLABELS[lang]} from this card`:`Add ${LLABELS[lang]} to this card`;
+    const dot=el('span','dot dot-'+lang);
+    pill.appendChild(dot);pill.appendChild(document.createTextNode(' '+LLABELS[lang]));
+    pill.addEventListener('click',()=>{
+      const cur=lOvr[i]!==undefined?new Set(lOvr[i]):new Set(gSel);
+      cur.has(lang)?cur.delete(lang):cur.add(lang);
+      const match=LANGS.every(l=>cur.has(l)===gSel.has(l));
+      if(match)delete lOvr[i];else lOvr[i]=cur;
+      renderCards();
+    });
+    pr.appendChild(pill);
+  });
+  if(!ec){
+    const h=el('span');h.style.cssText='font-size:11px;color:var(--ink-faint);font-style:italic;font-family:"Crimson Pro",serif';
+    h.textContent='All languages shown globally';pr.appendChild(h);
+  }
+  ftr.appendChild(pr);return ftr;
+}
+
+/* ══ Search / highlight engine ══ */
+function applySearch(){
+  clearAllMarks();
+  const q=sQuery.trim();
+  const fields=SCOPE_F[sScope]||SCOPE_F.all;
+  let vis=0;
+
+  document.querySelectorAll('.card').forEach(card=>{
+    const w=DATA[+card.dataset.idx];if(!w)return;
+    let match=!q;
+    if(q){
+      const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
+      for(const f of fields){
+        const raw=String(f==='id'?w.id:w[f]||'');
+        const hay=sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
+        if(hay.includes(nq)){match=true;break;}
+      }
+    }
+    card.style.display=match?'':'none';
+    card.classList.remove('s-match','s-cur');
+    if(match)vis++;
+  });
+
+  document.getElementById('filtInfo').style.display=(q&&vis!==DATA.length)?'':'none';
+  document.getElementById('filtCount').textContent=vis;
+
+  if(q){
+    allMarks=[];
+    document.querySelectorAll('.card').forEach(card=>{
+      if(card.style.display==='none')return;
+      let hit=false;
+      card.querySelectorAll('[data-field]').forEach(node=>{
+        const fn=node.dataset.field;
+        if(sScope!=='all'&&!fields.includes(fn))return;
+        const raw=node.textContent;
+        const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
+        const hay=sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
+        const positions=[];let s=0;
+        while(true){const p=hay.indexOf(nq,s);if(p===-1)break;positions.push(p);s=p+1;}
+        if(!positions.length)return;
+        hit=true;
+        const frag=hlFrag(raw,positions,nq.length,sNorm);
+        node.innerHTML='';node.appendChild(frag);
+        node.querySelectorAll('mark.sh').forEach(m=>allMarks.push(m));
+      });
+      if(hit)card.classList.add('s-match');
+    });
+    curMark=allMarks.length?0:-1;
+    updateCurMark();
+  }
+
+  updateCountEl();
+  const has=allMarks.length>0;
+  document.getElementById('navNext').disabled=!has;
+  document.getElementById('navPrev').disabled=!has;
+}
+
+function hlFrag(orig,positions,mlen,normalized){
+  const frag=document.createDocumentFragment();
+  if(!normalized){
+    let last=0;
+    positions.forEach(p=>{
+      if(p>last)frag.appendChild(document.createTextNode(orig.slice(last,p)));
+      const m=document.createElement('mark');m.className='sh';m.textContent=orig.slice(p,p+mlen);
+      frag.appendChild(m);last=p+mlen;
+    });
+    if(last<orig.length)frag.appendChild(document.createTextNode(orig.slice(last)));
+  }else{
+    const norm=NepaliNormalizer.normalize(orig);
+    const n2o=buildN2O(orig,norm);
+    let last=0;
+    positions.forEach(np=>{
+      const os=n2o[np]??np;
+      const oe=n2o[np+mlen]??Math.min(os+mlen,orig.length);
+      if(os>last)frag.appendChild(document.createTextNode(orig.slice(last,os)));
+      const m=document.createElement('mark');m.className='sh';m.textContent=orig.slice(os,oe);
+      frag.appendChild(m);last=oe;
+    });
+    if(last<orig.length)frag.appendChild(document.createTextNode(orig.slice(last)));
+  }
+  return frag;
+}
+
+function buildN2O(orig,norm){
+  const map={};let oi=0,ni=0;
+  while(oi<orig.length){
+    const c=orig[oi];
+    if(c==='\u200D'||c==='\u200C'){oi++;continue;}
+    map[ni]=oi;oi++;ni++;
+  }
+  map[ni]=oi;return map;
+}
+
+function clearAllMarks(){
+  document.querySelectorAll('mark.sh').forEach(m=>{
+    const p=m.parentNode;if(!p)return;
+    p.replaceChild(document.createTextNode(m.textContent),m);p.normalize();
+  });
+  allMarks=[];curMark=-1;
+}
+
+function navMark(dir){
+  if(!allMarks.length)return;
+  curMark=(curMark+dir+allMarks.length)%allMarks.length;
+  updateCurMark();
+}
+
+function updateCurMark(){
+  allMarks.forEach((m,i)=>m.classList.toggle('cur',i===curMark));
+  if(curMark>=0&&allMarks[curMark]){
+    const m=allMarks[curMark];
+    const card=m.closest('.card');
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('s-cur'));
+    if(card)card.classList.add('s-cur');
+    const sh=document.getElementById('ribbonSticky').offsetHeight+50;
+    const r=m.getBoundingClientRect();
+    if(r.top<sh||r.bottom>innerHeight-40)
+      window.scrollTo({top:scrollY+r.top-sh-20,behavior:'smooth'});
+  }
+  updateCountEl();
+}
+
+function updateCountEl(){
+  const el=document.getElementById('sCount');
+  const q=sQuery.trim();
+  if(!q){el.textContent='';el.className='s-count';return;}
+  if(!allMarks.length){el.textContent='No match';el.className='s-count none';return;}
+  el.textContent=`${curMark+1} / ${allMarks.length}`;
+  el.className='s-count ok';
+}
+
+/* ══ Init ══ */
+syncGPills();
+renderCards();
+if(window._wlf)console.warn('[Lexicon] word.js not loaded — using fallback data.');
+</script>
+</body>
+</html>
