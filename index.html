@@ -395,6 +395,17 @@ mark.sh.cur{background:var(--hl-cur);color:var(--hl-txt);outline:2px solid var(-
         <label class="lang-pill" id="pill-all"><input type="checkbox" id="gAll"><span class="dot dot-all"></span>सर्व</label>
       </div>
       <div class="r-sep"></div>
+      <label class="norm-toggle" id="paginationToggle" title="Enable pagination (50 items/page)">
+        <input type="checkbox" id="paginationCk">
+        <span class="norm-box"></span>
+        <span class="norm-txt">Pagination</span>
+      </label>
+      <label class="norm-toggle" id="virtualToggle" title="Enable virtual scrolling (chunked load)">
+        <input type="checkbox" id="virtualCk">
+        <span class="norm-box"></span>
+        <span class="norm-txt">Virtual</span>
+      </label>
+      <div class="r-sep"></div>
       <button class="btn-reset" id="btnReset" title="Reset all overrides and revert to सं only">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
         Reset
@@ -410,6 +421,19 @@ mark.sh.cur{background:var(--hl-cur);color:var(--hl-txt);outline:2px solid var(-
   <div class="stat" id="filtInfo" style="display:none">·&nbsp;Showing:&nbsp;<span class="stat-n" id="filtCount">0</span></div>
   <div class="stat" id="ovInfo" style="display:none">
     <span class="ov-badge" id="ovBadge">✦ <span id="ovCount">0</span> local override(s) — click to clear</span>
+  </div>
+  <div class="stat" id="pagerInfo" style="display:none;align-items:center;gap:8px">
+    <select id="pageSizeSelect" style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 4px;border:1px solid var(--card-border);background:var(--sand);color:var(--ink);border-radius:4px;">
+      <option value="25">25</option>
+      <option value="50" selected>50</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+      <option value="all">All</option>
+    </select>
+    <input type="number" id="pageInput" min="1" style="width:50px;font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px;border:1px solid var(--card-border);background:var(--sand);color:var(--ink);border-radius:4px;text-align:center;" />
+    <span id="pageIndicator">1 / 1</span>
+    <button class="nav-btn" id="prevPage" disabled>← Page</button>
+    <button class="nav-btn" id="nextPage" disabled>Page →</button>
   </div>
 </div>
 
@@ -472,6 +496,15 @@ let isDark=false;
 let sQuery='',sScope='all',sNorm=false;
 let allMarks=[],curMark=-1;
 
+let filteredIndexes=DATA.map((_,i)=>i);
+let enablePagination=false;
+let enableVirtual=false;
+let currentPage=1;
+let pageSize=50;
+const CHUNK_SIZE=50;
+let virtualIndex=0;
+let totalPage=1;
+
 /* ══ Theme ══ */
 document.getElementById('themeToggle').addEventListener('click',()=>{
   isDark=!isDark;
@@ -498,13 +531,13 @@ function syncGPills(){
 function onGChange(lang){
   if(lang==='all'){gSel=LANGS.every(l=>gSel.has(l))?new Set(['sa']):new Set(LANGS);}
   else{if(gSel.has(lang)){gSel.delete(lang);if(!gSel.size)gSel.add('sa');}else gSel.add(lang);}
-  syncGPills();renderCards();
+  syncGPills();applySearch();
 }
 Object.keys(gCks).forEach(l=>gPills[l].addEventListener('click',e=>{e.preventDefault();onGChange(l);}));
 
 /* ══ Reset ══ */
-document.getElementById('btnReset').addEventListener('click',()=>{gSel=new Set(['sa']);lOvr={};syncGPills();renderCards();});
-document.getElementById('ovBadge').addEventListener('click',()=>{lOvr={};renderCards();});
+document.getElementById('btnReset').addEventListener('click',()=>{gSel=new Set(['sa']);lOvr={};syncGPills();applySearch();});
+document.getElementById('ovBadge').addEventListener('click',()=>{lOvr={};applySearch();});
 
 /* ══ Scope pills ══ */
 document.querySelectorAll('.sp').forEach(p=>{
@@ -524,6 +557,59 @@ normTgl.addEventListener('click',e=>{
   normTgl.classList.toggle('on',sNorm);applySearch();
 });
 
+const paginationToggle = document.getElementById('paginationToggle');
+const virtualToggle = document.getElementById('virtualToggle');
+const paginationCk = document.getElementById('paginationCk');
+const virtualCk = document.getElementById('virtualCk');
+
+paginationToggle.addEventListener('click',e=>{
+  e.preventDefault();
+  enablePagination = !enablePagination;
+  paginationCk.checked = enablePagination;
+  paginationToggle.classList.toggle('on', enablePagination);
+  if(enablePagination && pageSize === 'all') pageSize = 50;
+  applySearch();
+});
+
+virtualToggle.addEventListener('click',e=>{
+  e.preventDefault();
+  enableVirtual = !enableVirtual;
+  virtualCk.checked = enableVirtual;
+  virtualToggle.classList.toggle('on', enableVirtual);
+  if(enableVirtual){
+    window.addEventListener('scroll', onVirtualScroll, {passive:true});
+  } else {
+    window.removeEventListener('scroll', onVirtualScroll);
+  }
+  applySearch();
+});
+
+document.getElementById('prevPage').addEventListener('click',()=>{
+  if(currentPage>1){currentPage--;applySearch();window.scrollTo({top:0,behavior:'smooth'});}
+});
+
+document.getElementById('nextPage').addEventListener('click',()=>{
+  if(currentPage<totalPage){currentPage++;applySearch();window.scrollTo({top:0,behavior:'smooth'});}
+});
+
+document.getElementById('pageSizeSelect').addEventListener('change',()=>{
+  pageSize = document.getElementById('pageSizeSelect').value;
+  if(pageSize !== 'all') pageSize = parseInt(pageSize);
+  currentPage=1;
+  applySearch();
+});
+
+document.getElementById('pageInput').addEventListener('change',()=>{
+  const val = parseInt(document.getElementById('pageInput').value);
+  if(val >=1 && val <= totalPage){
+    currentPage=val;
+    applySearch();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    document.getElementById('pageInput').value = currentPage;
+  }
+});
+
 /* ══ Search ══ */
 const sInput=document.getElementById('searchInput');
 sInput.addEventListener('input',()=>{sQuery=sInput.value;applySearch();});
@@ -540,6 +626,81 @@ function clearSrch(){sInput.value='';sQuery='';applySearch();sInput.focus();}
 function effLangs(i){return lOvr[i]!==undefined?lOvr[i]:gSel;}
 function el(tag,cls){const e=document.createElement(tag||'div');if(cls)e.className=cls;return e;}
 
+function computeFilteredIndexes(){
+  const q=sQuery.trim();
+  const fields=SCOPE_F[sScope]||SCOPE_F.all;
+  if(!q){filteredIndexes=DATA.map((_,i)=>i);} else {
+    const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
+    filteredIndexes=[];
+    DATA.forEach((w,i)=>{
+      for(const f of fields){
+        const raw = String(f==='id'?w.id:w[f]||'');
+        const hay = sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
+        if(hay.includes(nq)){filteredIndexes.push(i);break;}
+      }
+    });
+  }
+  totalPage= pageSize === 'all' ? 1 : Math.max(1,Math.ceil(filteredIndexes.length/pageSize));
+  if(currentPage>totalPage)currentPage=totalPage;
+  if(currentPage<1)currentPage=1;
+  if(virtualIndex>filteredIndexes.length)virtualIndex=Math.max(0,filteredIndexes.length-CHUNK_SIZE);
+}
+
+function getVisibleIndexes(){
+  if(enableVirtual){
+    return filteredIndexes.slice(0,virtualIndex+CHUNK_SIZE);
+  }
+  if(enablePagination){
+    if(pageSize === 'all') return filteredIndexes;
+    const start=(currentPage-1)*pageSize;
+    return filteredIndexes.slice(start,start+pageSize);
+  }
+  return filteredIndexes;
+}
+
+function updatePagerUI(){
+  const pager=document.getElementById('pagerInfo');
+  if(enablePagination){
+    pager.style.display='flex';
+    document.getElementById('pageSizeSelect').value = pageSize.toString();
+    document.getElementById('pageInput').value = currentPage;
+    document.getElementById('pageInput').max = totalPage;
+    document.getElementById('pageIndicator').textContent=`${currentPage} / ${totalPage}`;
+    document.getElementById('prevPage').disabled=currentPage<=1;
+    document.getElementById('nextPage').disabled=currentPage>=totalPage;
+  } else if(enableVirtual){
+    pager.style.display='flex';
+    document.getElementById('pageIndicator').textContent=`${Math.min(virtualIndex, filteredIndexes.length)} / ${filteredIndexes.length}`;
+    document.getElementById('prevPage').disabled=true;
+    document.getElementById('nextPage').disabled=true;
+  } else {
+    pager.style.display='none';
+  }
+}
+
+function loadMore(){
+  if(!enableVirtual) return;
+  const list = document.getElementById('cardsList');
+  const nextStart = virtualIndex;
+  const slice = filteredIndexes.slice(nextStart, nextStart+CHUNK_SIZE);
+  slice.forEach((idx,i)=>{
+    const card = buildCard(DATA[idx], idx);
+    card.style.animationDelay = '0s';
+    list.appendChild(card);
+  });
+  virtualIndex += slice.length;
+  if(virtualIndex>filteredIndexes.length)virtualIndex=filteredIndexes.length;
+  document.getElementById('pageIndicator').textContent=`${Math.min(virtualIndex,filteredIndexes.length)} / ${filteredIndexes.length}`;
+
+  if(sQuery.trim()){
+    highlightCurrentCards();
+    updateCountEl();
+    const has=allMarks.length>0;
+    document.getElementById('navNext').disabled=!has;
+    document.getElementById('navPrev').disabled=!has;
+  }
+}
+
 /* ══ Render ══ */
 function renderCards(){
   const list=document.getElementById('cardsList');
@@ -549,12 +710,28 @@ function renderCards(){
   document.getElementById('ovInfo').style.display=ovc?'':'none';
   document.getElementById('ovCount').textContent=ovc;
   if(!DATA.length){list.innerHTML='<div class="empty-state">कोई शब्द नहीं मिला · No words found</div>';return;}
-  DATA.forEach((w,i)=>{
-    const c=buildCard(w,i);
+
+  computeFilteredIndexes();
+  updatePagerUI();
+
+  if(enableVirtual){
+    virtualIndex=0;
+    loadMore();
+    return;
+  }
+
+  const visible = getVisibleIndexes();
+  if(!visible.length){
+    list.innerHTML='<div class="empty-state">कोई शब्द नहीं मिला · No words found</div>';
+    updatePagerUI();
+    return;
+  }
+
+  visible.forEach((idx,i)=>{
+    const c=buildCard(DATA[idx],idx);
     c.style.animationDelay=Math.min(i*.04,.4)+'s';
     list.appendChild(c);
   });
-  applySearch();
 }
 
 /* ══ Build card ══ */
@@ -603,7 +780,7 @@ function buildFtr(i,hasOv){
   lr.appendChild(lbl);
   if(hasOv){
     const cb=el('span');cb.style.cssText='font-size:10px;color:var(--vermillion);cursor:pointer;font-family:"JetBrains Mono",monospace;letter-spacing:1px';
-    cb.textContent='× Clear';cb.addEventListener('click',()=>{delete lOvr[i];renderCards();});
+    cb.textContent='× Clear';cb.addEventListener('click',()=>{delete lOvr[i];applySearch();});
     lr.appendChild(cb);
   }
   ftr.appendChild(lr);
@@ -622,7 +799,7 @@ function buildFtr(i,hasOv){
       cur.has(lang)?cur.delete(lang):cur.add(lang);
       const match=LANGS.every(l=>cur.has(l)===gSel.has(l));
       if(match)delete lOvr[i];else lOvr[i]=cur;
-      renderCards();
+      applySearch();
     });
     pr.appendChild(pill);
   });
@@ -636,58 +813,73 @@ function buildFtr(i,hasOv){
 /* ══ Search / highlight engine ══ */
 function applySearch(){
   clearAllMarks();
-  const q=sQuery.trim();
-  const fields=SCOPE_F[sScope]||SCOPE_F.all;
-  let vis=0;
-
-  document.querySelectorAll('.card').forEach(card=>{
-    const w=DATA[+card.dataset.idx];if(!w)return;
-    let match=!q;
-    if(q){
-      const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
-      for(const f of fields){
-        const raw=String(f==='id'?w.id:w[f]||'');
-        const hay=sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
-        if(hay.includes(nq)){match=true;break;}
-      }
-    }
-    card.style.display=match?'':'none';
-    card.classList.remove('s-match','s-cur');
-    if(match)vis++;
-  });
-
-  document.getElementById('filtInfo').style.display=(q&&vis!==DATA.length)?'':'none';
-  document.getElementById('filtCount').textContent=vis;
-
-  if(q){
-    allMarks=[];
-    document.querySelectorAll('.card').forEach(card=>{
-      if(card.style.display==='none')return;
-      let hit=false;
-      card.querySelectorAll('[data-field]').forEach(node=>{
-        const fn=node.dataset.field;
-        if(sScope!=='all'&&!fields.includes(fn))return;
-        const raw=node.textContent;
-        const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
-        const hay=sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
-        const positions=[];let s=0;
-        while(true){const p=hay.indexOf(nq,s);if(p===-1)break;positions.push(p);s=p+1;}
-        if(!positions.length)return;
-        hit=true;
-        const frag=hlFrag(raw,positions,nq.length,sNorm);
-        node.innerHTML='';node.appendChild(frag);
-        node.querySelectorAll('mark.sh').forEach(m=>allMarks.push(m));
-      });
-      if(hit)card.classList.add('s-match');
-    });
-    curMark=allMarks.length?0:-1;
-    updateCurMark();
+  computeFilteredIndexes();
+  if(enableVirtual){
+    virtualIndex=0;
+  } else {
+    currentPage = Math.min(Math.max(currentPage,1),totalPage);
   }
+  renderCards();
+
+  const q=sQuery.trim();
+  const totalFiltered=filteredIndexes.length;
+  document.getElementById('filtInfo').style.display=(q&&totalFiltered!==DATA.length)?'':'none';
+  document.getElementById('filtCount').textContent=totalFiltered;
+  updatePagerUI();
+
+  const cards = document.querySelectorAll('.card');
+  if(!q || !cards.length){
+    updateCountEl();
+    document.getElementById('navNext').disabled=true;
+    document.getElementById('navPrev').disabled=true;
+    return;
+  }
+
+  highlightCurrentCards();
 
   updateCountEl();
   const has=allMarks.length>0;
   document.getElementById('navNext').disabled=!has;
   document.getElementById('navPrev').disabled=!has;
+}
+
+function highlightCurrentCards(){
+  const q=sQuery.trim();
+  if(!q){
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('s-match','s-cur'));
+    allMarks=[];curMark=-1;
+    return;
+  }
+  const fields=SCOPE_F[sScope]||SCOPE_F.all;
+  const nq=sNorm?NepaliNormalizer.normalize(q):q.toLowerCase();
+  allMarks=[];
+
+  document.querySelectorAll('.card').forEach(card=>{
+    let hit=false;
+    card.classList.remove('s-match','s-cur');
+    card.querySelectorAll('[data-field]').forEach(node=>{
+      const fn=node.dataset.field;
+      if(sScope!=='all' && !fields.includes(fn)) return;
+      const raw=node.textContent;
+      const hay=sNorm?NepaliNormalizer.normalize(raw):raw.toLowerCase();
+      const positions=[];
+      let s=0;
+      while(true){
+        const p=hay.indexOf(nq,s);
+        if(p===-1) break;
+        positions.push(p); s=p+1;
+      }
+      if(!positions.length) return;
+      hit=true;
+      const frag=hlFrag(raw,positions,nq.length,sNorm);
+      node.innerHTML=''; node.appendChild(frag);
+      node.querySelectorAll('mark.sh').forEach(m=>allMarks.push(m));
+    });
+    if(hit) card.classList.add('s-match');
+  });
+
+  curMark = allMarks.length?0:-1;
+  updateCurMark();
 }
 
 function hlFrag(orig,positions,mlen,normalized){
@@ -740,6 +932,14 @@ function navMark(dir){
   updateCurMark();
 }
 
+function onVirtualScroll(){
+  if(!enableVirtual) return;
+  const remaining = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+  if(remaining < 180 && virtualIndex < filteredIndexes.length){
+    loadMore();
+  }
+}
+
 function updateCurMark(){
   allMarks.forEach((m,i)=>m.classList.toggle('cur',i===curMark));
   if(curMark>=0&&allMarks[curMark]){
@@ -766,7 +966,7 @@ function updateCountEl(){
 
 /* ══ Init ══ */
 syncGPills();
-renderCards();
+applySearch();
 if(window._wlf)console.warn('[Lexicon] word.js not loaded — using fallback data.');
 </script>
 </body>
